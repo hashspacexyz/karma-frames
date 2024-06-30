@@ -1,36 +1,26 @@
 import { getFrameMetadata } from '@coinbase/onchainkit/frame';
 import type { Metadata } from 'next';
-import { NEXT_PUBLIC_URL } from './config';
+
+import { APP_URL } from './config';
 
 const frameMetadata = getFrameMetadata({
   buttons: [
     {
-      label: 'Story time',
-    },
-    {
-      action: 'tx',
-      label: 'Send Base Sepolia',
-      target: `${NEXT_PUBLIC_URL}/api/tx`,
-      postUrl: `${NEXT_PUBLIC_URL}/api/tx-success`,
+      label: 'Check my score',
     },
   ],
   image: {
-    src: `${NEXT_PUBLIC_URL}/park-3.png`,
+    src: `${APP_URL}/karma-cover.png`,
     aspectRatio: '1:1',
   },
-  input: {
-    text: 'Tell me a story',
-  },
-  postUrl: `${NEXT_PUBLIC_URL}/api/frame`,
+  postUrl: `${APP_URL}/api/frame/score`,
 });
 
 export const metadata: Metadata = {
-  title: 'zizzamia.xyz',
-  description: 'LFG',
+  title: 'Got hash?',
+  description: 'Check your #_ karma',
   openGraph: {
-    title: 'zizzamia.xyz',
-    description: 'LFG',
-    images: [`${NEXT_PUBLIC_URL}/park-1.png`],
+    images: [`${APP_URL}/karma-cover.png`],
   },
   other: {
     ...frameMetadata,
@@ -39,8 +29,8 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <>
-      <h1>zizzamia.xyz</h1>
-    </>
+    <main className="flex flex-col items-center min-h-screen w-screen bg-grid bg-primary">
+      <h1 className="font-mono">#_</h1>
+    </main>
   );
 }

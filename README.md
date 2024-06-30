@@ -1,192 +1,45 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Zizzamia/a-frame-in-100-lines/blob/main/public/park-4.png">
-    <img alt="OnchainKit logo vibes" src="https://github.com/Zizzamia/a-frame-in-100-lines/blob/main/public/park-4.png" width="auto">
+    <source media="(prefers-color-scheme: dark)" srcset="https://hashspace.xyz/logo.png">
+    <img alt="#_" src="https://hashspace.xyz/logo.png" width="200">
   </picture>
 </p>
 
-# A Frame in 100 lines (or less)
+# Hashspace Channel Karma
 
-Farcaster Frames in less than 100 lines, and ready to be deployed to Vercel.
+channel engagement ❤️ —> token rewards 📈
 
-To test a **deployed** Frame, use: https://warpcast.com/~/developers/frames.
+A reward system that acknowledges and incentivizes every community contributor based on verifiable engagement.
 
-To test a **localhost** Frame, use: [Framegear](https://onchainkit.xyz/frame/framegear).
-A simple tool that allows you to run and test your frames locally:
+This repo is the frames frontend for the project.
 
-- without publishing
-- without casting
-- without spending warps
+Built during [Onchain Summer Buildathon](https://onchainsummer.xyz/)
 
-And let us know what you build by either mentioning @zizzamia on [Warpcast](https://warpcast.com/zizzamia) or [X](https://twitter.com/Zizzamia).
+## Overview
 
-<br />
+The channel karma system operates in epochs with two phases:
 
-Have fun! ⛵️
+**1. Accumulation of Points:**
 
-<br />
+- **Engage**: Earn points by casting, replying, recasting, and liking within the Farcaster channel.
+- **On-Chain Points**: calculated with function encoded on-chain.
+- **Verification**: Engagement is verified on the Degen Chain.
 
-## App Routing files
+**2. Claiming Points at the end of an Epoch**
 
-- app/
-  - [config.ts](https://github.com/Zizzamia/a-frame-in-100-lines?tab=readme-ov-file#appconfigts)
-  - [layout.tsx](https://github.com/Zizzamia/a-frame-in-100-lines?tab=readme-ov-file#applayouttsx)
-  - [page.tsx](https://github.com/Zizzamia/a-frame-in-100-lines?tab=readme-ov-file#apppagetsx)
-- api/
-  - frame/
-    - [route.ts](https://github.com/Zizzamia/a-frame-in-100-lines?tab=readme-ov-file#appapiframeroutets)
+- **Claim Points**: Accrued points can be claimed at the end of each epoch.
+- **Token Rewards**: Points distribute ERC20 tokens or other configurable token types.
 
-<br />
+Epochs drive continuous participation and reward cycles.
 
-### `app/page.tsx`
+## Community
 
-```tsx
-import { getFrameMetadata } from '@coinbase/onchainkit/frame';
-import type { Metadata } from 'next';
-import { NEXT_PUBLIC_URL } from './config';
-
-const frameMetadata = getFrameMetadata({
-  buttons: [
-    {
-      label: 'Story time!',
-    },
-    {
-      action: 'link',
-      label: 'Link to Google',
-      target: 'https://www.google.com',
-    },
-    {
-      label: 'Redirect to pictures',
-      action: 'post_redirect',
-    },
-  ],
-  image: {
-    src: `${NEXT_PUBLIC_URL}/park-3.png`,
-    aspectRatio: '1:1',
-  },
-  input: {
-    text: 'Tell me a boat story',
-  },
-  postUrl: `${NEXT_PUBLIC_URL}/api/frame`,
-});
-
-export const metadata: Metadata = {
-  title: 'zizzamia.xyz',
-  description: 'LFG',
-  openGraph: {
-    title: 'zizzamia.xyz',
-    description: 'LFG',
-    images: [`${NEXT_PUBLIC_URL}/park-1.png`],
-  },
-  other: {
-    ...frameMetadata,
-  },
-};
-
-export default function Page() {
-  return (
-    <>
-      <h1>zizzamia.xyz</h1>
-    </>
-  );
-}
-```
-
-### `app/layout.tsx`
-
-```tsx
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1.0,
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
-```
-
-### `app/config.ts`
-
-```ts
-export const NEXT_PUBLIC_URL = 'https://zizzamia.xyz';
-```
-
-### `app/api/frame/route.ts`
-
-```ts
-import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
-import { NextRequest, NextResponse } from 'next/server';
-import { NEXT_PUBLIC_URL } from '../../config';
-
-async function getResponse(req: NextRequest): Promise<NextResponse> {
-  let accountAddress: string | undefined = '';
-  let text: string | undefined = '';
-
-  const body: FrameRequest = await req.json();
-  const { isValid, message } = await getFrameMessage(body, { neynarApiKey: 'NEYNAR_ONCHAIN_KIT' });
-
-  if (isValid) {
-    accountAddress = message.interactor.verified_accounts[0];
-  }
-
-  if (message?.input) {
-    text = message.input;
-  }
-
-  if (message?.button === 3) {
-    return NextResponse.redirect(
-      'https://www.google.com/search?q=cute+dog+pictures&tbm=isch&source=lnms',
-      { status: 302 },
-    );
-  }
-
-  return new NextResponse(
-    getFrameHtmlResponse({
-      buttons: [
-        {
-          label: `🌲 ${text} 🌲`,
-        },
-      ],
-      image: {
-        src: `${NEXT_PUBLIC_URL}/park-1.png`,
-      },
-      postUrl: `${NEXT_PUBLIC_URL}/api/frame`,
-    }),
-  );
-}
-
-export async function POST(req: NextRequest): Promise<Response> {
-  return getResponse(req);
-}
-
-export const dynamic = 'force-dynamic';
-```
-
-<br />
-
-## Resources
-
-- [Official Farcaster Frames documentation](https://docs.farcaster.xyz/learn/what-is-farcaster/frames)
-- [Official Farcaster Frame specification](https://docs.farcaster.xyz/reference/frames/spec)
-- [OnchainKit documentation](https://onchainkit.xyz)
-
-<br />
-
-## Community ☁️ 🌁 ☁️
-
-Check out the following places for more OnchainKit-related content:
-
-- Follow @zizzamia ([X](https://twitter.com/zizzamia), [Farcaster](https://warpcast.com/zizzamia)) for project updates
-- Join the discussions on our [OnchainKit warpcast channel](https://warpcast.com/~/channel/onchainkit)
+Join the [/hashspace](https://warpcast.com/~/channel/hashspace) channel on Farcaster
 
 ## Authors
 
-- [@zizzamia](https://github.com/zizzamia.png) ([X](https://twitter.com/Zizzamia))
-- [@cnasc](https://github.com/cnasc.png) ([warpcast](https://warpcast.com/cnasc))
+- [@ewerx](https://github.com/ewerx.png) ([Farcaster](https://warpcast.com/ewerx), [X](https://twitter.com/ewerx))
+- [@amitshah](https://github.com/amitshah.png) ([Farcaster](https://warpcast.com/))
 
 ## License
 
